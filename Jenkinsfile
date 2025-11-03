@@ -23,7 +23,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 echo 'Checking out code...'
-                git branch: 'main', url: 'https://github.com/your-username/my-cicd-app.git' // *** CHANGE THIS TO YOUR REPO URL ***
+                git branch: 'master', url: 'https://github.com/your-username/my-cicd-app.git' // *** CHANGE THIS TO YOUR REPO URL ***
             }
         }
 
