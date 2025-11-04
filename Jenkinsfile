@@ -7,7 +7,7 @@ pipeline {
     // Environment variables used throughout the pipeline
     environment {
         // --- YOU MUST EDIT THESE ---
-        AWS_REGION               = "us-east-1" // Change to your AWS region
+        AWS_REGION               = "eu-north-1" // Change to your AWS region
         ECR_REGISTRY             = "YOUR_AWS_ACCOUNT_ID.dkr.ecr.YOUR_REGION.amazonaws.com" // Change Account ID and Region
         ECR_REPOSITORY           = "jenkins" // Change to your ECR repository name
         DEPLOY_SERVER_IP         = "16.170.237.29/" // Change to your deployment server's IP
