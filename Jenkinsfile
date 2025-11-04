@@ -9,10 +9,10 @@ pipeline {
         // --- YOU MUST EDIT THESE ---
         AWS_REGION               = "us-east-1" // Change to your AWS region
         ECR_REGISTRY             = "YOUR_AWS_ACCOUNT_ID.dkr.ecr.YOUR_REGION.amazonaws.com" // Change Account ID and Region
-        ECR_REPOSITORY           = "my-web-app" // Change to your ECR repository name
-        DEPLOY_SERVER_IP         = "YOUR_DEPLOYMENT_EC2_PUBLIC_IP" // Change to your deployment server's IP
+        ECR_REPOSITORY           = "jenkins" // Change to your ECR repository name
+        DEPLOY_SERVER_IP         = "16.170.237.29/" // Change to your deployment server's IP
         // --- NO EDITS NEEDED BELOW ---
-        APP_NAME                 = "my-web-app"
+        APP_NAME                 = "jenkins"
         DEPLOY_SERVER_USER       = "ec2-user"
         DEPLOY_SERVER_KEY_ID     = "deploy-server-key" // The ID of the credential in Jenkins
         IMAGE_TAG                = "${ECR_REGISTRY}/${ECR_REPOSITORY}:${BUILD_NUMBER}"
