@@ -1,20 +1,20 @@
-# Use an official Node.js runtime as a parent image
+# Example Dockerfile - make sure it copies files from the correct context
 FROM node:18-alpine
 
-# Set the working directory in the container
+# Create app directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json (if available)
+# Copy package files
 COPY package*.json ./
 
-# Install app dependencies
+# Install dependencies
 RUN npm install
 
-# Bundle app's source code
+# Copy app source
 COPY . .
 
-# Expose the port the app runs on
+# Expose port
 EXPOSE 3000
 
-# Define the command to run the app
-CMD [ "npm", "start" ]
+# Start command
+CMD ["node", "server.js"]
