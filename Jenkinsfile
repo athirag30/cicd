@@ -1,21 +1,15 @@
-// This Jenkinsfile defines the CI/CD pipeline.
-// It must be in the root of your GitHub repository.
-
 pipeline {
-    agent any // Run on any available Jenkins agent
+    agent any
 
-    // Environment variables used throughout the pipeline
     environment {
-        // --- UPDATE THESE WITH YOUR VALUES ---
-        AWS_REGION               = "eu-north-1" // Your ECR region
-        ECR_REGISTRY             = "453624448677.dkr.ecr.eu-north-1.amazonaws.com" // Your ECR registry from the screenshot
-        ECR_REPOSITORY           = "jenkins" // Your ECR repository name
-        DEPLOY_SERVER_IP         = "16.170.237.29" // Your deployment server IP (remove trailing slash)
-        GITHUB_REPO              = "https://github.com/athirag30/cicd.git" // Your actual GitHub repo
+        // --- YOUR ACTUAL CONFIGURATION ---
+        AWS_REGION               = "eu-north-1"
+        ECR_REGISTRY             = "453624448677.dkr.ecr.eu-north-1.amazonaws.com"
+        ECR_REPOSITORY           = "jenkins"
+        DEPLOY_SERVER_IP         = "16.170.237.29"
+        GITHUB_REPO              = "https://github.com/athirag30/cicd.git"
         // --- NO EDITS NEEDED BELOW ---
-        APP_NAME                 = "jenkins"
-        DEPLOY_SERVER_USER       = "ec2-user"
-        DEPLOY_SERVER_KEY_ID     = "ec2-ssh-key" // The ID of the credential in Jenkins
+        APP_NAME                 = "webapp"
         IMAGE_TAG                = "${ECR_REGISTRY}/${ECR_REPOSITORY}:${BUILD_NUMBER}"
     }
 
@@ -23,12 +17,12 @@ pipeline {
         // Stage 1: Checkout code from GitHub
         stage('Checkout') {
             steps {
-                echo 'Checking out code...'
-                git branch: 'main', url: "${GITHUB_REPO}" // Using your actual repo
+                echo 'Checking out code from GitHub...'
+                git branch: 'main', url: "${GITHUB_REPO}"
             }
         }
 
-        // Stage 2: Build the Node.js application (and run tests)
+        // Stage 2: Build the Node.js application
         stage('Build & Test') {
             steps {
                 echo 'Building and testing the application...'
@@ -41,7 +35,6 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image: ${IMAGE_TAG}"
-                // Build the image using the Dockerfile in current directory
                 sh "docker build -t ${IMAGE_TAG} ."
             }
         }
@@ -50,45 +43,45 @@ pipeline {
         stage('Push to ECR') {
             steps {
                 echo "Pushing Docker image to ECR..."
-                // Login to ECR
                 sh "aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_REGISTRY}"
                 sh "docker push ${IMAGE_TAG}"
             }
         }
 
-        // Stage 5: Deploy to EC2 Instance
-        stage('Deploy to EC2') {
+        // Stage 5: Deploy to EC2
+        stage('Deploy') {
             steps {
-                echo "Deploying application to ${DEPLOY_SERVER_IP}..."
-                // Since we're deploying to the same server, we can deploy directly
-                sh """
-                    # Stop and remove the old container, if it exists
-                    echo 'Stopping and removing old container...'
-                    docker stop ${APP_NAME} || true
-                    docker rm ${APP_NAME} || true
+                echo "Deploying application..."
+                script {
+                    // Stop and remove old container
+                    sh 'docker stop webapp-container || true'
+                    sh 'docker rm webapp-container || true'
                     
-                    # Run the new container (no need to pull since we built it here)
-                    echo 'Running new container...'
-                    docker run -d -p 3000:3000 --name ${APP_NAME} ${IMAGE_TAG}
+                    // Run new container
+                    sh "docker run -d -p 3000:3000 --name webapp-container ${IMAGE_TAG}"
                     
-                    echo 'Deployment complete.'
-                """
+                    echo "Deployment complete!"
+                }
             }
         }
     }
 
-    // Post-build actions: run regardless of pipeline status
     post {
         always {
-            echo 'Pipeline finished.'
-            // Clean up Docker to save space
+            echo 'Pipeline completed.'
+            // Clean up Docker images to save space
             sh 'docker system prune -f'
         }
         success {
-            echo 'Pipeline succeeded!'
+            echo 'Pipeline succeeded! Application is deployed and running.'
+            sh """
+                echo "Application should be available at: http://${DEPLOY_SERVER_IP}:3000"
+                echo "Checking container status:"
+                docker ps | grep webapp-container || echo "Container not found"
+            """
         }
         failure {
-            echo 'Pipeline failed!'
+            echo 'Pipeline failed! Check the logs above for errors.'
         }
     }
 }
