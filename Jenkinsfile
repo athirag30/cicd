@@ -26,8 +26,10 @@ pipeline {
         stage('Build & Test') {
             steps {
                 echo 'Building and testing the application...'
-                sh 'npm install'
-                sh 'npm test || echo "Tests completed - continuing deployment"'
+                dir('app') {
+                    sh 'npm install'
+                    sh 'npm test || echo "Tests completed - continuing deployment"'
+                }
             }
         }
 
@@ -35,7 +37,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 echo "Building Docker image: ${IMAGE_TAG}"
-                sh "docker build -t ${IMAGE_TAG} ."
+                dir('app') {
+                    sh "docker build -t ${IMAGE_TAG} ."
+                }
             }
         }
 
