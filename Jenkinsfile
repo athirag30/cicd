@@ -10,7 +10,7 @@ pipeline {
         AWS_REGION               = "eu-north-1" // Change to your AWS region
         ECR_REGISTRY             = "453624448677.dkr.ecr.eu-north-1.amazonaws.com" // Change Account ID and Region
         ECR_REPOSITORY           = "jenkins" // Change to your ECR repository name
-        DEPLOY_SERVER_IP         = "16.170.237.29/" // Change to your deployment server's IP
+        DEPLOY_SERVER_IP         = "16.170.237.29" // Change to your deployment server's IP
         // --- NO EDITS NEEDED BELOW ---
         APP_NAME                 = "jenkins"
         DEPLOY_SERVER_USER       = "ec2-user"
